@@ -43,3 +43,17 @@ assets/document/
 *.sublime-project
 /tests/tests/
 /tests/results/
+/vendor
+/node_modules
+
+/assets/documents
+/assets/sponser_documents
+/assets/images/passport
+
+/application/cache/*
+/application/logs/*
+
+*.zip
+*.sql
+
+.env
