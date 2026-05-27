@@ -330,7 +330,7 @@ $comp_id = $comp_id ?? null;
             </div>
         </div>
         <div id="passportUploadSection" class="<?php echo $has_passport ? 'hidden' : ''; ?>">
-            <input type="file" id="sponsorPassportInput" accept="image/*" <?php echo $has_passport ? '' : 'required'; ?>
+                 <input type="file" id="sponsorPassportInput" name="passport_file" accept="image/*" <?php echo $has_passport ? '' : 'required'; ?>
                    class="block w-full text-sm text-gray-700 file:mr-4 file:py-2.5 file:px-4 file:rounded-md 
                           file:border-0 file:font-semibold file:bg-cyan-50 file:text-cyan-700 hover:file:bg-cyan-100 
                           dark:file:bg-gray-700 dark:file:text-gray-300">
@@ -496,7 +496,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         var hasExisting = <?php echo $has_passport ? 'true' : 'false'; ?>;
         var cropped = document.getElementById('passportCropped').value;
-        if (!hasExisting && !cropped) {
+        var sponsorInput = document.getElementById('sponsorPassportInput');
+        var hasSelectedFile = sponsorInput && sponsorInput.files && sponsorInput.files.length > 0;
+        if (!hasExisting && !cropped && !hasSelectedFile) {
             alert('<?php echo $this->lang->line('please_select_passport') ?? 'Please select a passport photo'; ?>');
             return;
         }

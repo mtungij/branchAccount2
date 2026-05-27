@@ -3696,7 +3696,10 @@ public function create_sponser($customer_id = null, $comp_id = null)
     $this->form_validation->set_rules('sp_relation', 'Relationship', 'required');
     $this->form_validation->set_rules('nature', 'Business Nature', 'required');
 
-    if ($existingSponsorPassport === '') {
+    $passportData = $this->input->post('passport_cropped');
+    $hasPassportFileUpload = !empty($_FILES['passport_file']['name']);
+
+    if ($existingSponsorPassport === '' && empty($passportData) && !$hasPassportFileUpload) {
       $this->form_validation->set_rules('passport_cropped', 'Passport Size Photo', 'required');
     }
 
@@ -3756,7 +3759,6 @@ public function create_sponser($customer_id = null, $comp_id = null)
     /* ================= PASSPORT (BASE64) ================= */
 
     $passportPath = $existingSponsorPassport;
-    $passportData = $this->input->post('passport_cropped');
 
     if (!empty($passportData)) {
         $passportBase64 = preg_replace(
@@ -3782,6 +3784,29 @@ public function create_sponser($customer_id = null, $comp_id = null)
         }
 
         file_put_contents(FCPATH . $passportPath, $passportDecoded);
+      } elseif ($hasPassportFileUpload) {
+        $tmpFile = $_FILES['passport_file']['tmp_name'];
+        $originalName = $_FILES['passport_file']['name'];
+        $extension = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+
+        if (in_array($extension, $allowedExtensions, true) && is_uploaded_file($tmpFile)) {
+          $passportFileName = 'passport_' . $customer_id . '_' . time() . '.' . $extension;
+          $passportPath = 'assets/sponser_passport/' . $passportFileName;
+
+          if (!file_exists(FCPATH . 'assets/sponser_passport/')) {
+            mkdir(FCPATH . 'assets/sponser_passport/', 0755, true);
+          }
+
+          if ($existingSponsorPassport !== '') {
+            $oldPassportFullPath = FCPATH . ltrim($existingSponsorPassport, '/');
+            if (file_exists($oldPassportFullPath)) {
+              @unlink($oldPassportFullPath);
+            }
+          }
+
+          move_uploaded_file($tmpFile, FCPATH . $passportPath);
+        }
     }
 
     /* ================= PREPARE DATA ================= */
