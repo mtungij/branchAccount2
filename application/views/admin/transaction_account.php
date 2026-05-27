@@ -4,8 +4,8 @@
 include_once APPPATH . "views/partials/header.php";
 
 $is_super_admin = ($this->session->userdata('role') === 'admin');
-$can_account_edit = $is_super_admin || has_permission('Setting Payment Method', 'can_edit') || has_permission('Transaction Accounts', 'can_edit');
-$can_account_delete = $is_super_admin || has_permission('Setting Payment Method', 'can_delete') || has_permission('Transaction Accounts', 'can_delete');
+$can_account_edit = true;
+$can_account_delete = true;
 
 // --- DUMMY DATA - REMOVE AND LOAD FROM YOUR CONTROLLER ---
 // Your controller should pass $account, an array of account objects.
