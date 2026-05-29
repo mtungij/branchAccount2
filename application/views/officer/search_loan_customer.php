@@ -37,6 +37,7 @@ $resolve_image_src = function ($value, $default_rel = 'assets/img/customer21.png
 
 $customer_passport_src = $resolve_image_src($customer->passport ?? '', 'assets/img/customer21.png');
 $sponsor_passport_src = $resolve_image_src($customer->passport_path ?? '', 'assets/img/customer21.png');
+$withdraw_validation_errors = $withdraw_validation_errors ?? '';
 ?>
 <!-- ========== MAIN CONTENT BODY ========== -->
 <div class="w-full lg:ps-64">
@@ -49,6 +50,20 @@ $sponsor_passport_src = $resolve_image_src($customer->passport_path ?? '', 'asse
                 <div class="ms-3"><h3 class="text-gray-800 font-semibold dark:text-white">Success</h3><p class="mt-2 text-sm text-gray-700 dark:text-gray-400"><?php echo $das;?></p></div>
                 <div class="ps-3 ms-auto"><button type="button" class="inline-flex bg-teal-50 rounded-lg p-1.5 text-teal-500 hover:bg-teal-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-teal-50 focus:ring-teal-600 dark:bg-transparent dark:hover:bg-teal-800/50 dark:text-teal-600" data-hs-remove-element="[role=alert]"><span class="sr-only">Dismiss</span><svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div>
             </div>
+        </div>
+        <?php endif; ?>
+
+        <?php if (!empty($withdraw_validation_errors)): ?>
+        <div class="bg-red-100 border border-red-200 text-sm text-red-800 rounded-lg p-4" role="alert">
+          <div class="font-semibold mb-2">Validation errors</div>
+          <div><?= $withdraw_validation_errors; ?></div>
+        </div>
+        <?php endif; ?>
+
+        <?php if ($err = $this->session->flashdata('error')): ?>
+        <div class="bg-red-100 border border-red-200 text-sm text-red-800 rounded-lg p-4" role="alert">
+          <div class="font-semibold mb-2">Error</div>
+          <div><?= $err; ?></div>
         </div>
         <?php endif; ?>
 
@@ -419,7 +434,7 @@ $sponsor_passport_src = $resolve_image_src($customer->passport_path ?? '', 'asse
         * Kiasi cha Kugawa:
       </label>
       <input type="text" id="withdrow_<?php echo $customer->customer_id; ?>" name="withdrow"
- value="<?php echo $remain_balance->balance; ?>"
+     value="<?= set_value('withdrow', $remain_balance->balance); ?>"
   class="py-2.5 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-cyan-500 focus:ring-cyan-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:placeholder-gray-500 dark:focus:ring-gray-600"
   required>
 
@@ -434,7 +449,7 @@ $sponsor_passport_src = $resolve_image_src($customer->passport_path ?? '', 'asse
         class="py-2.5 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-cyan-500 focus:ring-cyan-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:focus:ring-gray-600">
         <option value="">Chagua Malipo</option>
         <?php foreach ($acount as $acounts): ?>
-          <option value="<?= $acounts->trans_id; ?>" style="color: #16a34a;"><?= $acounts->account_name; ?> - Salio: <?= number_format(isset($acounts->blanch_capital) ? $acounts->blanch_capital : 0); ?></option>
+          <option value="<?= $acounts->trans_id; ?>" style="color: #16a34a;" <?= set_select('method', $acounts->trans_id); ?>><?= $acounts->account_name; ?> - Salio: <?= number_format(isset($acounts->blanch_capital) ? $acounts->blanch_capital : 0); ?></option>
         <?php endforeach; ?>
       </select>
     </div>
@@ -445,7 +460,7 @@ $sponsor_passport_src = $resolve_image_src($customer->passport_path ?? '', 'asse
         * Tarehe:
       </label>
       <input type="date" id="with_date_<?php echo $customer->customer_id; ?>" name="with_date"
-        value="<?= date('Y-m-d'); ?>"
+        value="<?= set_value('with_date', date('Y-m-d')); ?>"
         class="py-2.5 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-cyan-500 focus:ring-cyan-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:placeholder-gray-500 dark:focus:ring-gray-600"
         required>
     </div>
@@ -673,6 +688,27 @@ include_once APPPATH . "views/partials/footer.php";
 <!-- Include Select2 JS -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const hasWithdrawValidationErrors = <?= !empty($withdraw_validation_errors) ? 'true' : 'false'; ?>;
+  if (!hasWithdrawValidationErrors) {
+    return;
+  }
+
+  const modalSelector = '#hs-edit-shareholder-modal-<?= $customer->customer_id; ?>';
+
+  if (window.HSOverlay && typeof window.HSOverlay.open === 'function') {
+    window.HSOverlay.open(modalSelector);
+    return;
+  }
+
+  const modalEl = document.querySelector(modalSelector);
+  if (modalEl) {
+    modalEl.classList.remove('hidden');
+  }
+});
+</script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {

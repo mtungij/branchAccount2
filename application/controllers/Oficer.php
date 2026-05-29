@@ -7612,9 +7612,29 @@ if (substr($phone_sp, 0, 1) === '0') {
 
 		// $this->sendsms($phone,$massage);
 
-         return redirect('oficer/data_with_depost/'.$customer_id);
-    }
-   $this->data_with_depost($customer_id);
+            return redirect('oficer/data_with_depost/'.$customer_id);
+          }
+
+          $customer = $this->queries->search_CustomerLoan($customer_id);
+          $customer_blanch_id = !empty($customer->blanch_id) ? $customer->blanch_id : $blanch_id;
+          $acount = $this->queries->get_customer_account_verfied($customer_blanch_id);
+          $deposts = $this->queries->get_sumTodayDepostBlanch($blanch_id);
+          $withdraw = $this->queries->get_sumTodayWithdrawalBlanch($blanch_id);
+          $blanch_amount_balance = $this->queries->get_blanch_capital_data($blanch_id);
+          $customery = $this->queries->get_allcutomerblanchData($blanch_id);
+          $privillage = $this->queries->get_position_empl($empl_id);
+
+          $this->load->view('officer/search_loan_customer', [
+         'customer' => $customer,
+         'blanch_amount_balance' => $blanch_amount_balance,
+         'deposts' => $deposts,
+         'withdraw' => $withdraw,
+         'acount' => $acount,
+         'empl_data' => $empl_data,
+         'customery' => $customery,
+         'privillage' => $privillage,
+         'withdraw_validation_errors' => validation_errors()
+          ]);
     
 }
 
