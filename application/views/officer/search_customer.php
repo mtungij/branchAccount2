@@ -330,7 +330,7 @@ $comp_id = $comp_id ?? null;
             </div>
         </div>
         <div id="passportUploadSection" class="<?php echo $has_passport ? 'hidden' : ''; ?>">
-                 <input type="file" id="sponsorPassportInput" name="passport_file" accept="image/*" <?php echo $has_passport ? '' : 'required'; ?>
+                                 <input type="file" id="sponsorPassportInput" name="passport_file" accept="image/*"
                    class="block w-full text-sm text-gray-700 file:mr-4 file:py-2.5 file:px-4 file:rounded-md 
                           file:border-0 file:font-semibold file:bg-cyan-50 file:text-cyan-700 hover:file:bg-cyan-100 
                           dark:file:bg-gray-700 dark:file:text-gray-300">
