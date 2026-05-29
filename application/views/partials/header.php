@@ -16,16 +16,22 @@ $html_lang = ($ui_lang === 'swahili') ? 'sw' : 'en';
 
 
 
-<link rel="manifest" href="/manifest.json?v=2">
+<link rel="manifest" href="/manifest.json?v=3">
 <meta name="theme-color" content="#0d6efd">
 <link rel="apple-touch-icon" href="/assets/img/logo-192.png">
 <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
 <script>
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js')
+  navigator.serviceWorker.register('/sw.js?v=4', { updateViaCache: 'none' })
         .then(() => console.log('Service Worker Registered'))
         .catch(err => console.log('SW Error: ', err));
+
+  navigator.serviceWorker.getRegistration().then(reg => {
+    if (reg) {
+      reg.update();
+    }
+  });
 }
 
 // Optional: Listen for beforeinstallprompt to trigger install manually

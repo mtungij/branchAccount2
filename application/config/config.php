@@ -23,7 +23,28 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
 */
-$config['base_url'] = getenv('BASE_URL');
+$env_base_url = getenv('BASE_URL');
+
+if (empty($env_base_url)) {
+	$is_https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || ((int)($_SERVER['SERVER_PORT'] ?? 80) === 443);
+	$scheme = $is_https ? 'https' : 'http';
+	$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+	$env_base_url = $scheme . '://' . $host . '/';
+}
+
+// Prevent accidental localhost base URL in production hosts.
+if (
+	stripos($env_base_url, 'localhost') !== false
+	&& !empty($_SERVER['HTTP_HOST'])
+	&& stripos($_SERVER['HTTP_HOST'], 'localhost') === false
+	&& $_SERVER['HTTP_HOST'] !== '127.0.0.1'
+) {
+	$is_https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || ((int)($_SERVER['SERVER_PORT'] ?? 80) === 443);
+	$scheme = $is_https ? 'https' : 'http';
+	$env_base_url = $scheme . '://' . $_SERVER['HTTP_HOST'] . '/';
+}
+
+$config['base_url'] = rtrim($env_base_url, '/') . '/';
 
 /*
 |--------------------------------------------------------------------------
