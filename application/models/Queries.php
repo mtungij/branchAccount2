@@ -12795,6 +12795,16 @@ public function get_today_offficerexpected_collections($blanch_id, $empl_id)
 		   $this->db->where('e.empl_no', $empl_no);
 		   return $this->db->get()->row();
 	   }
+
+	   public function employee_users_data($empl_no)
+	   {
+		   $this->db->select('e.*, p.position');
+		   $this->db->from('tbl_employee e');
+		   $this->db->join('tbl_position p', 'p.position_id = e.position_id', 'left');
+		   $this->db->where('e.empl_no', $empl_no);
+		   $this->db->order_by('e.empl_id', 'DESC');
+		   return $this->db->get()->result();
+	   }
 	   
 
 

@@ -408,39 +408,41 @@ public function Employee_signin()
         return $this->employee_login();
     }
 
-    $empl_no        = $this->input->post('empl_no', TRUE);
+    $empl_no        = trim((string) $this->input->post('empl_no', TRUE));
     $password_input = $this->input->post('password', TRUE);
 
     $this->load->model('queries');
-    $user = $this->queries->employee_user_data($empl_no);
+    $users = $this->queries->employee_users_data($empl_no);
 
     // ================= USER EXISTS =================
-    if (!$user) {
+    if (empty($users)) {
         $this->session->set_flashdata('mass', "Your phone number or password is invalid, please try again");
         return redirect("welcome/employee_login");
     }
 
-    // ================= PASSWORD CHECK =================
-    $stored_password = $user->password;
-    $login_success   = false;
+    // Match against all rows for this phone number to avoid logging into the wrong account when duplicates exist.
+    $user = null;
+    foreach ($users as $candidate) {
+        $stored_password = (string) ($candidate->password ?? '');
 
-    // OLD SHA1 PASSWORD
-    if (strlen($stored_password) === 40 && sha1($password_input) === $stored_password) {
-        $login_success = true;
+        // OLD SHA1 PASSWORD
+        if (strlen($stored_password) === 40 && sha1($password_input) === $stored_password) {
+            $new_hash = password_hash($password_input, PASSWORD_BCRYPT);
+            $this->db->where('empl_id', $candidate->empl_id)
+                     ->update('tbl_employee', ['password' => $new_hash]);
+            $candidate->password = $new_hash;
+            $user = $candidate;
+            break;
+        }
 
-        // Upgrade to bcrypt
-        $new_hash = password_hash($password_input, PASSWORD_BCRYPT);
-
-        // ❗ FIXED TABLE NAME (removed backtick bug)
-        $this->db->where('empl_id', $user->empl_id)
-                 ->update('tbl_employee', ['password' => $new_hash]);
+        // BCRYPT PASSWORD
+        if (!empty($stored_password) && password_verify($password_input, $stored_password)) {
+            $user = $candidate;
+            break;
+        }
     }
-    // BCRYPT PASSWORD
-    elseif (password_verify($password_input, $stored_password)) {
-        $login_success = true;
-    }
 
-    if (!$login_success) {
+    if (!$user) {
         $this->session->set_flashdata('mass', "Your phone number or password is invalid, please try again");
         return redirect("welcome/employee_login");
     }

@@ -13662,8 +13662,21 @@ if (empty($ui_lang)) {
 $idiom = ($ui_lang === 'swahili') ? 'swahili' : 'english';
 $this->lang->load('app', $idiom);
 
-if (!$this->session->userdata("comp_id"))
-    return redirect('welcome/employee_login');
+if (!$this->session->userdata("comp_id")) {
+    redirect('welcome/employee_login');
+    exit;
+}
+
+$position_id = (int) $this->session->userdata('position_id');
+$role = (string) $this->session->userdata('role');
+$is_management_employee = ($position_id === 22);
+$is_company_admin = ($role === 'admin');
+
+if (!$is_management_employee && !$is_company_admin) {
+    $this->session->set_flashdata('mass', 'You are not authorized to access admin pages.');
+    redirect('oficer/index');
+    exit;
+}
 }
 
     // ============================================================
