@@ -3697,7 +3697,16 @@ public function create_sponser($customer_id = null, $comp_id = null)
     $this->form_validation->set_rules('nature', 'Business Nature', 'required');
 
     $passportData = $this->input->post('passport_cropped');
-    $hasPassportFileUpload = !empty($_FILES['passport_file']['name']);
+    $passportFileName = isset($_FILES['passport_file']['name'])
+      ? trim((string) $_FILES['passport_file']['name'])
+      : '';
+    $legacyPassportFileName = isset($_FILES['passport']['name'])
+      ? trim((string) $_FILES['passport']['name'])
+      : '';
+    $passportUploadField = $passportFileName !== ''
+      ? 'passport_file'
+      : ($legacyPassportFileName !== '' ? 'passport' : null);
+    $hasPassportFileUpload = $passportUploadField !== null;
 
     if ($existingSponsorPassport === '' && empty($passportData) && !$hasPassportFileUpload) {
       $this->form_validation->set_rules('passport_cropped', 'Passport Size Photo', 'required');
@@ -3785,8 +3794,8 @@ public function create_sponser($customer_id = null, $comp_id = null)
 
         file_put_contents(FCPATH . $passportPath, $passportDecoded);
       } elseif ($hasPassportFileUpload) {
-        $tmpFile = $_FILES['passport_file']['tmp_name'];
-        $originalName = $_FILES['passport_file']['name'];
+        $tmpFile = $_FILES[$passportUploadField]['tmp_name'];
+        $originalName = $_FILES[$passportUploadField]['name'];
         $extension = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
         $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
 
