@@ -7360,6 +7360,14 @@ public function create_withdrow_balance($customer_id){
     $company_data = $this->queries->get_companyData($comp_id);
     $blanch_data = $this->queries->get_blanchData($blanch_id);
     $empl_data = $this->queries->get_employee_data($empl_id);
+
+    // Keep required hidden fields populated even when customer payload misses them.
+    if (empty($this->input->post('comp_id'))) {
+      $_POST['comp_id'] = $comp_id;
+    }
+    if (empty($this->input->post('blanch_id'))) {
+      $_POST['blanch_id'] = $blanch_id;
+    }
    
     $this->form_validation->set_rules('customer_id','Customer','required');
     $this->form_validation->set_rules('comp_id','Company','required');

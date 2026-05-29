@@ -38,6 +38,8 @@ $resolve_image_src = function ($value, $default_rel = 'assets/img/customer21.png
 $customer_passport_src = $resolve_image_src($customer->passport ?? '', 'assets/img/customer21.png');
 $sponsor_passport_src = $resolve_image_src($customer->passport_path ?? '', 'assets/img/customer21.png');
 $withdraw_validation_errors = $withdraw_validation_errors ?? '';
+$session_comp_id = $this->session->userdata('comp_id');
+$session_blanch_id = $this->session->userdata('blanch_id');
 ?>
 <!-- ========== MAIN CONTENT BODY ========== -->
 <div class="w-full lg:ps-64">
@@ -482,8 +484,8 @@ $withdraw_validation_errors = $withdraw_validation_errors ?? '';
   <input type="hidden" value="withdrawal" name="loan_status">
   <input type="hidden" value="<?php echo $customer_loan->loan_id; ?>" name="loan_id">
   <input type="hidden" value="<?php echo $customer->customer_id; ?>" name="customer_id">
-  <input type="hidden" value="<?php echo $customer->comp_id; ?>" name="comp_id">
-  <input type="hidden" value="<?php echo $customer->blanch_id; ?>" name="blanch_id">
+  <input type="hidden" value="<?= !empty($customer->comp_id) ? $customer->comp_id : $session_comp_id; ?>" name="comp_id">
+  <input type="hidden" value="<?= !empty($customer->blanch_id) ? $customer->blanch_id : $session_blanch_id; ?>" name="blanch_id">
 
 
 
